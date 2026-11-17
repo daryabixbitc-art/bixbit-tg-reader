@@ -53,7 +53,7 @@ WEBAPP_URL = os.environ["SHEET_WEBAPP_URL"]
 WEBAPP_TOKEN = os.environ["SHEET_TOKEN"]
 
 FIRST_RUN_DAYS = int(os.environ.get("FIRST_RUN_DAYS", "14"))   # how far back on the first read of a chat
-MAX_PER_CHAT = int(os.environ.get("MAX_PER_CHAT", "300"))      # messages read per chat per run
+MAX_PER_CHAT = int(os.environ.get("MAX_PER_CHAT", "3000"))      # messages read per chat per run
 MIN_TEXT_LEN = 25
 PAUSE_BETWEEN_CHATS = 3                                          # seconds, keeps well under Telegram limits
 TEXT_LIMIT = 2000                                                # chars stored per message
