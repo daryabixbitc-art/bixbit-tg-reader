@@ -82,15 +82,18 @@ def call(action, **payload):
     raise RuntimeError(f"web app call {action} failed: {last_err}")
 
 
+EXCLUDE = ["в наличии", "прайс", "price list", "pricelist", "in stock", "pre-order", "предзаказ", "предоплат", "оптом", "доставка", "usdt", "под заказ", "продам", "продаю", "for sale", "wts", "добро пожаловать"]
+
+
 def match(text, keywords):
     t = text.lower()
+    if any(x in t for x in EXCLUDE):
+        return [], []
     hits = [k for k, _ in keywords if k in t]
     groups = {g for k, g in keywords if k in t}
-    # keep a message only if it touches hardware/scale AND a product or competitor,
-    # or names a competitor at all (competitor_pain signals)
-    useful = ("competitor" in groups) or (
-        groups & {"hardware", "scale"} and groups & {"AMS", "Firmware", "Cooling"}
-    )
+    # keep a message only if it shows business scale (fleet, hosting, MW, containers...)
+    # together with a product topic, hardware or a competitor mention
+    useful = "scale" in groups and bool(groups & {"AMS", "Firmware", "Cooling", "competitor", "hardware"})
     return (hits if useful else []), sorted(groups)
 
 
@@ -139,6 +142,8 @@ async def read_chat(client, handle, last_id, keywords, seen):
             author = ""
             try:
                 s = await m.get_sender()
+                if s is not None and getattr(s, "bot", False):
+                    continue
                 if s is not None and getattr(s, "username", None):
                     author = "@" + s.username
             except Exception:
